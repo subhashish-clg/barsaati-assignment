@@ -1,0 +1,5 @@
+.venv
+.env
+trends/**
+
+__pycache__/
