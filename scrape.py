@@ -18,7 +18,7 @@ import datetime
 load_dotenv()
 
 
-def get_trends(retry=5):
+def get_trends():
     proxies = {}
     trends_json_object = []
 
@@ -92,11 +92,10 @@ def get_trends(retry=5):
 
         driver.close()
 
+        return IP_ADDRESS, trends_json_object
+
     except:
         return None
-
-    finally:
-        return IP_ADDRESS, trends_json_object
 
 
 if __name__ == "__main__":

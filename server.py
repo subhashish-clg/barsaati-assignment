@@ -7,9 +7,13 @@ from pymongo.server_api import ServerApi
 import flask
 import datetime
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
+
 import bson
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 load_dotenv()
@@ -37,7 +41,7 @@ trends_collections = db["trends"]
 
 
 @app.route("/trends")
-def hello_world():
+def trends_handler():
     fallback = request.args.get("fallback")
 
     if fallback == "latest":
@@ -64,6 +68,7 @@ def hello_world():
 
         return jsonify({
             "IP": trends["IP"],
+            "date": trends["date"],
             "trends": trends["trends"]
         })
 

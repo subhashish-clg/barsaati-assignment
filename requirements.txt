@@ -3,3 +3,4 @@ python-dotenv
 webdriver-manager
 pymongo[srv]
 Flask
+flask-cors
