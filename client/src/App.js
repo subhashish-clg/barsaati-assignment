@@ -31,7 +31,9 @@ function App() {
           onClick={async (e) => {
             e.preventDefault();
 
-            getTrends("http://localhost:5000/trends?fallback=latest");
+            getTrends(
+              `${process.env.REACT_APP_SERVER_URL}/trends?fallback=latest`
+            );
           }}
         >
           Click here to run the script
