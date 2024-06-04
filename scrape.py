@@ -90,11 +90,12 @@ def get_trends(retry=5):
 
         driver.implicitly_wait(int(os.environ["DELAY_IMPLICIT"]))  # seconds
 
+        driver.close()
+
     except:
         return None
 
     finally:
-        driver.close()
         return IP_ADDRESS, trends_json_object
 
 
