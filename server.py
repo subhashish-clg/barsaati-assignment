@@ -66,3 +66,7 @@ def hello_world():
             "IP": trends["IP"],
             "trends": trends["trends"]
         })
+
+
+if __name__ == "__main__":
+    app.run(host=os.environ["HOST"], port=os.environ["PORT"])
