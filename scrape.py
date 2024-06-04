@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
+import requests
 
 import json
 import os
@@ -17,15 +18,31 @@ import datetime
 load_dotenv()
 
 
-def get_trends():
+def get_trends(retry=5):
+    proxies = {}
     trends_json_object = []
 
+    options = Options()
+
+    if "PROXY" in os.environ:
+        options.add_experimental_option("detach", True)
+        options.add_argument('--proxy-server=%s' % os.environ["PROXY"])
+        proxies = {
+            "http": f"http://{os.environ['PROXY']}",
+            "https": f"http://{os.environ['PROXY']}"
+        }
+
+    IP_ADDRESS = requests.get(
+        "https://api.ipify.org/?format=json",
+        proxies=proxies
+    ).json()["ip"]
+
     try:
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(options=options)
         driver.get("https://x.com/login")
 
         # Enter username
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, int(os.environ["DELAY_WEBDRIVER"])).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "input[name='text']"))
         )
@@ -34,17 +51,18 @@ def get_trends():
         element = driver.find_element(By.XPATH, '//span[text()="Next"]')
         element.click()
 
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, int(os.environ["DELAY_WEBDRIVER"])).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "input[name='text']"))
         )
+
         if element:
             element.send_keys(os.environ["X_USERNAME"])
 
-        element = driver.find_element(By.XPATH, '//span[text()="Next"]')
-        element.click()
+            element = driver.find_element(By.XPATH, '//span[text()="Next"]')
+            element.click()
 
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, int(os.environ["DELAY_WEBDRIVER"])).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "input[name='password']"))
         )
@@ -53,39 +71,38 @@ def get_trends():
         element = driver.find_element(By.XPATH, '//span[text()="Log in"]')
         element.click()
 
-        trends = WebDriverWait(driver, 20).until(
+        driver.implicitly_wait(int(os.environ["DELAY_IMPLICIT"]))  # seconds
+
+        trends = WebDriverWait(driver, int(os.environ["DELAY_WEBDRIVER"])).until(
             EC.presence_of_all_elements_located(
                 (By.CSS_SELECTOR, '[data-testid="trend"]'))
         )
 
         for trend in trends:
-            trending_in, hashtag, number_of_posts = trend.text.split("\n")
+            trending_in, hashtag, additional_description = trend.text.split(
+                "\n")
 
             trends_json_object.append({
                 "trending_in": trending_in,
-                "hashtag": hashtag,
-                "number_of_post": number_of_posts
+                "hashtag": hashtag.replace("#", ""),
+                "additional_description": additional_description
             })
+
+        driver.implicitly_wait(int(os.environ["DELAY_IMPLICIT"]))  # seconds
+
+    except:
+        return None
 
     finally:
         driver.close()
-        return trends_json_object
-
-# PROXY = "sg.proxymesh.com:31280"
-
-# options = Options()
-# options.add_experimental_option("detach", True)
-# options.add_argument('--proxy-server=%s' % PROXY)
-
-
-# driver = webdriver.Chrome(service=Service(
-#     ChromeDriverManager().install()), options=options)
+        return IP_ADDRESS, trends_json_object
 
 
 if __name__ == "__main__":
     file_path = f"./trends/{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.json"
 
     with open(file_path, "+x") as f:
-        trends = get_trends()
-
-        json.dump(trends, f)
+        IP_ADDRESS, trends = get_trends()
+        print(IP_ADDRESS)
+        print(trends)
+        json.dump(trends, f, sort_keys=True, indent=4)
