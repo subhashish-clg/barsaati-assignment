@@ -30,13 +30,12 @@ function App() {
           className="text-blue-400 underline hover:text-blue-600 cursor-pointer"
           onClick={async (e) => {
             e.preventDefault();
+            const localServerURL = prompt("Enter the local server URL.");
 
-            getTrends(
-              `${process.env.REACT_APP_SERVER_URL}/trends?fallback=latest`
-            );
+            return getTrends(`${localServerURL}/trends?fallback=latest`);
           }}
         >
-          Click here to run the script
+          Click here to run the script (Enter the local server URL)
         </button>
         <button
           className="ml-4 text-blue-400 underline hover:text-blue-600 cursor-pointer"

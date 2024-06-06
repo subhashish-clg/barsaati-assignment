@@ -1,6 +1,7 @@
 [build]
+    # Change the directory to the React client.
     base = "client/"
-
+    # Change the build directory
     publish = "build/"
-
+    # Build the React Application
     command = "npm run build"
