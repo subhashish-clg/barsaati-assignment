@@ -26,12 +26,16 @@ load_dotenv()
 
 
 def get_trends():
-    proxies = {}
-    trends_json_object = []
+    """
+    Scrapes X.com and return the trends if succeeds else returns None.
+    """
+
+    proxies = {}  # Store URL of the proxies
+    trends_json_object = []  # Final trends object
 
     options = Options()
 
-    if "PROXY" in os.environ:
+    if "PROXY" in os.environ:  # Proxies are set using environment variables
         options.add_experimental_option("detach", True)
         options.headless = True
         options.add_argument('--proxy-server=%s' % os.environ["PROXY"])
@@ -40,6 +44,7 @@ def get_trends():
             "https": f"http://{os.environ['PROXY']}"
         }
 
+    # Retrieve current IP address (this changes if using Proxiy services like ProxyMesh)
     logger.info("Retrieving IP address for host.")
     IP_ADDRESS = requests.get(
         "https://api.ipify.org/?format=json",
@@ -48,6 +53,7 @@ def get_trends():
 
     try:
         driver = webdriver.Chrome(options=options)
+        driver.maximize_window()
 
         logger.info("Visiting X.com.")
         driver.get("https://x.com/login")
@@ -69,12 +75,13 @@ def get_trends():
                 (By.CSS_SELECTOR, "input[name='text']"))
         )
 
-        if element:
+        if element:  # Enter username again if there is an input field asking for it.
             element.send_keys(os.environ["X_USERNAME"])
 
             element = driver.find_element(By.XPATH, '//span[text()="Next"]')
             element.click()
 
+        # Enter the user password
         element = WebDriverWait(driver, int(os.environ["DELAY_WEBDRIVER"])).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "input[name='password']"))
@@ -107,7 +114,9 @@ def get_trends():
         logger.info("Closing web driver.")
         driver.close()
 
-        return IP_ADDRESS, trends_json_object
+        return {
+            "IP": IP_ADDRESS, "trends": trends_json_object
+        }
 
     except:
         return None
@@ -117,7 +126,5 @@ if __name__ == "__main__":
     file_path = f"./trends/{datetime.datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.json"
 
     with open(file_path, "+x") as f:
-        IP_ADDRESS, trends = get_trends()
-        print(IP_ADDRESS)
-        print(trends)
+        trends = get_trends()
         json.dump(trends, f, sort_keys=True, indent=4)
