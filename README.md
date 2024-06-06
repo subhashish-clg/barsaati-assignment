@@ -7,6 +7,7 @@ Web scraping with Selenium and ProxyMesh, storing the data in MongoDB, showing a
 ## Introduction
 
 The following video shows the working of the scraping script.
+[Watch the video](https://drive.google.com/file/d/1Pay95pZm5YiMxUian4pf7bbghLlMZD7T/preview)
 
 ## Environment varialbes
 
