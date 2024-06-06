@@ -26,19 +26,18 @@ function App() {
   return (
     <main className="container mx-auto py-8 px-4">
       <div>
-        <a
+        <button
           className="text-blue-400 underline hover:text-blue-600 cursor-pointer"
           onClick={async (e) => {
             e.preventDefault();
+            const localServerURL = prompt("Enter the local server URL.");
 
-            getTrends(
-              `${process.env.REACT_APP_SERVER_URL}/trends?fallback=latest`
-            );
+            return getTrends(`${localServerURL}/trends?fallback=latest`);
           }}
         >
-          Click here to run the script
-        </a>
-        <a
+          Click here to run the script (Enter the local server URL)
+        </button>
+        <button
           className="ml-4 text-blue-400 underline hover:text-blue-600 cursor-pointer"
           onClick={async (e) => {
             e.preventDefault();
@@ -50,7 +49,7 @@ function App() {
           }}
         >
           (or retrieve from cache)
-        </a>
+        </button>
 
         {isLoading && <p className="mt-8">Loading</p>}
         {trends && (
