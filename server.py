@@ -26,14 +26,6 @@ URI = 'mongodb+srv://{username}:{password}@cluster0.jrvk75u.mongodb.net/?retryWr
 )
 
 
-def dto(db_record):
-    return {
-        "date": db_record["date"],
-        "IP": db_record["IP"] if "IP" in db_record else None,
-        "trends": db_record["trends"]
-    }
-
-
 # Create a new client and connect to the server
 client = MongoClient(URI, server_api=ServerApi('1'))
 db = client["trends-database"]
@@ -64,6 +56,7 @@ def trends_handler():
 
         return jsonify({
             "IP": IP,
+            "date": datetime.datetime.now(tz=datetime.UTC),
             "trends": trends
         })
 
