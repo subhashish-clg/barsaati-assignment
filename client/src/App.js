@@ -32,7 +32,7 @@ function App() {
             e.preventDefault();
             const localServerURL = prompt("Enter the local server URL.");
 
-            return getTrends(`${localServerURL}/trends?fallback=latest`);
+            return getTrends(`${localServerURL}/trends/scrape`);
           }}
         >
           Click here to run the script (Enter the local server URL)
@@ -43,9 +43,7 @@ function App() {
             e.preventDefault();
             console.log(process.env.REACT_APP_SERVER_URL);
 
-            getTrends(
-              `${process.env.REACT_APP_SERVER_URL}/trends?fallback=cache`
-            );
+            getTrends(`${process.env.REACT_APP_SERVER_URL}/trends/cache`);
           }}
         >
           (or retrieve from cache)

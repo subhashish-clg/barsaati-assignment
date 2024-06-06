@@ -34,41 +34,38 @@ trends_collections = db["trends"]
 
 @app.route("/")
 def root_handler():
-    return "Hello world"
+    return "Visit <code>/trends/cache or /trends/scrape</code>"
 
 
-@app.route("/trends")
-def trends_handler():
-    fallback = request.args.get("fallback")
+@app.route("/trends/<type>", methods=["GET"])
+def trends_handler(type):
+    trends = {}
 
-    if fallback == "latest":
+    if type == "scrape":
         # Then scrape the web
         data = get_trends()
 
-        if not data:
+        if not data:  # If the scraping fails then return internal server error
             return "Internal Server Error", 500
 
-        IP, trends = data
+        # Store the trends into the database.
+        trends_collections.insert_one(trends)
 
-        trends_collections.insert_one({
-            "IP": IP, "date": datetime.datetime.now(tz=datetime.UTC), "trends": trends
-        })
+    if type == "cache" or type == "scrape":
+        # If the scraping is successfull then too return the data from the database.
+        data = trends_collections.find_one(sort=[("date", -1)])
 
-        return jsonify({
-            "IP": IP,
-            "date": datetime.datetime.now(tz=datetime.UTC),
-            "trends": trends
-        })
+        # Then retrieve from the database
+        trends = {
+            "IP": data["IP"],
+            "date": data["date"],
+            "trends": data["trends"]
+        }
+
+        return jsonify(trends)
 
     else:
-        # Then retrieve from the database
-        trends = trends_collections.find_one(sort=[("date", -1)])
-
-        return jsonify({
-            "IP": trends["IP"],
-            "date": trends["date"],
-            "trends": trends["trends"]
-        })
+        return "Not found", 404
 
 
 if __name__ == "__main__":
