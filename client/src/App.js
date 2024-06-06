@@ -26,7 +26,7 @@ function App() {
   return (
     <main className="container mx-auto py-8 px-4">
       <div>
-        <a
+        <button
           className="text-blue-400 underline hover:text-blue-600 cursor-pointer"
           onClick={async (e) => {
             e.preventDefault();
@@ -37,8 +37,8 @@ function App() {
           }}
         >
           Click here to run the script
-        </a>
-        <a
+        </button>
+        <button
           className="ml-4 text-blue-400 underline hover:text-blue-600 cursor-pointer"
           onClick={async (e) => {
             e.preventDefault();
@@ -50,7 +50,7 @@ function App() {
           }}
         >
           (or retrieve from cache)
-        </a>
+        </button>
 
         {isLoading && <p className="mt-8">Loading</p>}
         {trends && (
