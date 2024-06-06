@@ -1,0 +1,11 @@
+.venv
+.env
+trends/**
+
+__pycache__/
+
+# production
+client
+logs
+trends
+

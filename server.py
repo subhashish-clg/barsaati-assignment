@@ -40,6 +40,11 @@ db = client["trends-database"]
 trends_collections = db["trends"]
 
 
+@app.route("/")
+def root_handler():
+    return "Hello world"
+
+
 @app.route("/trends")
 def trends_handler():
     fallback = request.args.get("fallback")
